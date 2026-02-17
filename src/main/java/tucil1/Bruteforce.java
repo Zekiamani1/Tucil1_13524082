@@ -1,7 +1,8 @@
-import java.util.Scanner;
-
-public class program{
+package tucil1;
+public class Bruteforce{
     public static long iterasi = 0;
+    public static char[][][] currentmap = null;
+    
     public static boolean cek(int x,int y, char map[][][]){
         //cek sekolom
         for (int i = 0; i < map.length; i++) {
@@ -54,7 +55,8 @@ public class program{
             for (int row = 0; row < n; row++) {
                 map[row][(int) tempCount % n][1] = 'Y';
                 tempCount /= n;
-            }
+            }            
+            currentmap = copy(map);
             if (isvalid(map)) {
                 return map;
             }
@@ -66,44 +68,30 @@ public class program{
         }
         return null;
     }
-
-    public static void main(String[] args) {
-        
-        Scanner in=new Scanner(System.in);
-        int n=in.nextInt();
-        char map[][][]=new char[n][n][2];
-
-        in.nextLine();
-        for (int i = 0; i < n; i++) {
-            String temp=in.nextLine();
-            for (int j = 0; j < n; j++) {
-                map[i][j][1]='N';
-                map[i][j][0]=temp.charAt(j);
-            }
-        }
-
-        char[][][] map2;
-        
-        long start = System.nanoTime();
-        map2=bruteforce(map);
-        long end = System.nanoTime();
-        
-        double interval = (end - start) / 1_000_000_000.0;
-        
-        System.out.println("jumlah iterasi: " + iterasi);
-        System.out.printf("waktu pencarian: %.6f detik%n", interval);
-        System.out.println();
+    
+    private static char[][][] copy(char[][][] map) {
+        if (map == null) return null;
+        int n = map.length;
+        char[][][] copy = new char[n][n][2];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if(map2[i][j][1]=='Y'){
-                    System.out.print('#');
-                } else{
-                    System.out.print(map2[i][j][0]);
-                }
+                copy[i][j][0] = map[i][j][0];
+                copy[i][j][1] = map[i][j][1];
             }
-            System.out.println();
         }
+        return copy;
+    }
 
-        in.close();
+    public static char[][][] solve(String[] input, int n) {
+        char[][][] map = new char[n][n][2];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                map[i][j][1] = 'N';
+                map[i][j][0] = input[i].charAt(j);
+            }
+        }    
+        return bruteforce(map);
+       
     }
 }
+
