@@ -35,6 +35,8 @@ public class GUI extends Application {
     private Button loadFileButton;
     private Button clearButton;
     private Spinner<Integer> sizeSpinner;
+    private CheckBox liveUpdateCheckBox;
+    private Spinner<Integer> updateIntervalSpinner;
     private int BoardSize = 9;
     private Timeline updateTimeline;
     private long starttime;
@@ -120,6 +122,23 @@ public class GUI extends Application {
         });
         sizeBox.getChildren().addAll(sizeLabel, sizeSpinner);
         
+        Label liveUpdateLabel = new Label("Live Update Settings:");
+        liveUpdateLabel.setFont(Font.font("Times New Roman", FontWeight.BOLD, 12));
+        
+        liveUpdateCheckBox = new CheckBox("Show Live Updates");
+        liveUpdateCheckBox.setSelected(true);
+        liveUpdateCheckBox.setFont(Font.font("Times New Roman", 11));
+        
+        HBox intervalBox = new HBox(10);
+        intervalBox.setAlignment(Pos.CENTER_LEFT);
+        Label intervalLabel = new Label("Update Interval (ms):");
+        intervalLabel.setFont(Font.font("Times New Roman", 11));
+        updateIntervalSpinner = new Spinner<>(100, 10000, 500, 100);
+        updateIntervalSpinner.setEditable(true);
+        updateIntervalSpinner.setPrefWidth(100);
+        updateIntervalSpinner.disableProperty().bind(liveUpdateCheckBox.selectedProperty().not());
+        intervalBox.getChildren().addAll(intervalLabel, updateIntervalSpinner);
+        
         Label inputLabel = new Label("Bentuk Board:");
         inputLabel.setFont(Font.font("Times New Roman", FontWeight.BOLD, 12));
         
@@ -158,6 +177,10 @@ public class GUI extends Application {
         
         vbox.getChildren().addAll(
             sizeBox,
+            new Separator(),
+            liveUpdateLabel,
+            liveUpdateCheckBox,
+            intervalBox,
             new Separator(),
             inputLabel,
             inputArea,
@@ -343,17 +366,21 @@ public class GUI extends Application {
         Bruteforce.iterasi = 0;
         Bruteforce.currentmap = null;
         starttime = System.nanoTime();
-        updateTimeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
-            long currentIterations = Bruteforce.iterasi;
-            double elapsedSeconds = (System.nanoTime() - starttime) / 1_000_000_000.0;            
-            iterationsLabel.setText(String.format("Iterations: %,d", currentIterations));
-            timeLabel.setText(String.format("Time: %.2f seconds", elapsedSeconds));            
-            if (Bruteforce.currentmap != null) {
-                visualizeBoard(Bruteforce.currentmap);
-            }
-        }));
-        updateTimeline.setCycleCount(Timeline.INDEFINITE);
-        updateTimeline.play();
+        
+        if (liveUpdateCheckBox.isSelected()) {
+            int intervalMs = updateIntervalSpinner.getValue();
+            updateTimeline = new Timeline(new KeyFrame(Duration.millis((double) intervalMs), e -> {
+                long currentIterations = Bruteforce.iterasi;
+                double elapsedSeconds = (System.nanoTime() - starttime) / 1_000_000_000.0;            
+                iterationsLabel.setText(String.format("Iterations: %,d", currentIterations));
+                timeLabel.setText(String.format("Time: %.2f seconds", elapsedSeconds));            
+                if (Bruteforce.currentmap != null) {
+                    visualizeBoard(Bruteforce.copy(Bruteforce.currentmap));
+                }
+            }));
+            updateTimeline.setCycleCount(Timeline.INDEFINITE);
+            updateTimeline.play();
+        }
         
         new Thread(() -> {
             char[][][] result = Bruteforce.solve(lines,BoardSize);

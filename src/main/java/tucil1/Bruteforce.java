@@ -56,7 +56,6 @@ public class Bruteforce{
                 map[row][(int) tempCount % n][1] = 'Y';
                 tempCount /= n;
             }            
-            currentmap = copy(map);
             if (isvalid(map)) {
                 return map;
             }
@@ -69,7 +68,7 @@ public class Bruteforce{
         return null;
     }
     
-    private static char[][][] copy(char[][][] map) {
+    public static char[][][] copy(char[][][] map) {
         if (map == null) return null;
         int n = map.length;
         char[][][] copy = new char[n][n][2];
@@ -90,6 +89,7 @@ public class Bruteforce{
                 map[i][j][0] = input[i].charAt(j);
             }
         }    
+        currentmap = map;
         return bruteforce(map);
        
     }
