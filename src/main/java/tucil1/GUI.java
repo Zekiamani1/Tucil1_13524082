@@ -20,6 +20,7 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -394,8 +395,10 @@ public class GUI extends Application {
                 
                 if (result!=null) {
                     visualizeBoard((char[][][])result);
+                    saveSolutionToFile(result);
                     statusLabel.setText("Solution Found!");
                     statusLabel.setTextFill(Color.web("#27AE60"));
+
                 } else {
                     statusLabel.setText("No Solution Found");
                     statusLabel.setTextFill(Color.web("#E74C3C"));
@@ -460,6 +463,43 @@ public class GUI extends Application {
         iterationsLabel.setText("Iterations: -");
         timeLabel.setText("Time: -");
         solveButton.setDisable(true);
+    }
+    
+    private void saveSolutionToFile(char[][][] solution) {
+        if (solution == null) return;
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Solution");
+        fileChooser.setInitialFileName("solution.txt");
+        fileChooser.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("Text Files", "*.txt")
+        );
+        
+        File file = fileChooser.showSaveDialog(boardGrid.getScene().getWindow());
+        if (file != null) {
+            try (PrintWriter writer = new PrintWriter(file)) {
+                int size = solution.length;
+                for (int i = 0; i < size; i++) {
+                    for (int j = 0; j < size; j++) {
+                        if (solution[i][j][1] == 'Y') {
+                            writer.print('#');
+                        } else {
+                            writer.print(solution[i][j][0]);
+                        }
+                    }
+                    writer.println();
+                }
+                
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText(null);
+                alert.setContentText("Solution saved to: " + file.getName());
+                alert.showAndWait();
+                
+            } catch (IOException e) {
+                showAlert("Error", "Failed to save solution: " + e.getMessage());
+            }
+        }
     }
     
     private void showAlert(String title, String message) {
