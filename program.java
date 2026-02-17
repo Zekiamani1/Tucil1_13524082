@@ -48,45 +48,20 @@ public class program{
     }
     public static char[][][] bruteforce(char[][][] map){
         int n=map.length;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                for (int k = 0; k < n; k++) {
-                    for (int l = 0; l < n; l++) {
-                        for (int m = 0; m < n; m++) {
-                            for (int o = 0; o < n; o++) {
-                                for (int p = 0; p < n; p++) {
-                                    for (int q = 0; q < n; q++) {
-                                        for (int r = 0; r < n; r++) {
-                                            iterasi++;
-                                            map[0][i%n][1] = 'Y';
-                                            map[1][j%n][1] = 'Y';
-                                            map[2][k%n][1] = 'Y';
-                                            map[3][l%n][1] = 'Y';
-                                            map[4][m%n][1] = 'Y';
-                                            map[5][o%n][1] = 'Y';
-                                            map[6][p%n][1] = 'Y';
-                                            map[7][q%n][1] = 'Y';
-                                            map[8][r%n][1] = 'Y';
-                                            if(isvalid(map)){
-                                                return map;
-                                            } else {
-                                                map[0][i%n][1] = 'N';
-                                                map[1][j%n][1] = 'N';
-                                                map[2][k%n][1] = 'N';
-                                                map[3][l%n][1] = 'N';
-                                                map[4][m%n][1] = 'N';
-                                                map[5][o%n][1] = 'N';
-                                                map[6][p%n][1] = 'N';
-                                                map[7][q%n][1] = 'N';
-                                                map[8][r%n][1] = 'N';
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        for (long count = 0; count < (long) Math.pow(n, n); count++) {
+            iterasi++;
+            long tempCount = count;
+            for (int row = 0; row < n; row++) {
+                map[row][(int) tempCount % n][1] = 'Y';
+                tempCount /= n;
+            }
+            if (isvalid(map)) {
+                return map;
+            }
+            tempCount = count;
+            for (int row = 0; row < n; row++) {
+                map[row][(int)(tempCount % n)][1] = 'N';
+                tempCount /= n;
             }
         }
         return null;
